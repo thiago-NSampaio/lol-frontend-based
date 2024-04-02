@@ -1,3 +1,43 @@
+const routes = {
+  champions: "http://sdw24.sa-east-1.elasticbeanstalk.com/champions",
+  ask:"http://sdw24.sa-east-1.elasticbeanstalk.com/champions/{1}/ask"
+}
+
+const service = {
+  async getChampions() {
+      const route = routes.champions
+      const response = await fetch(route)
+      return await response.json()
+  },
+  async postAskChampions(id, message) {
+      const route = routes.ask.replace("{id}", id)
+      
+      const options = {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              question: message,
+          })
+      };
+
+      const response = await fetch(route,options)
+      return await response.json()
+  }
+}
+async function main() {
+console.log(service.getChampions())
+
+  // Chamada pra api
+  // Guardar dados de personagens
+  // Carregar personagens na tela
+  // resetar a tela
+  await loadCarrousel();
+}
+
+main()
+
 async function loadCarrousel() {
   const caroujs = (el) => {
     return $("[data-js=" + el + "]");
@@ -27,5 +67,7 @@ async function loadCarrousel() {
     ],
   });
 }
+
+
 
 loadCarrousel();
