@@ -1,6 +1,6 @@
 const routes = {
   champions: "http://sdw24.sa-east-1.elasticbeanstalk.com/champions",
-  ask:"http://sdw24.sa-east-1.elasticbeanstalk.com/champions/{1}/ask"
+  ask:"http://sdw24.sa-east-1.elasticbeanstalk.com/champions/{id}/ask"
 }
 
 const service = {
@@ -11,14 +11,15 @@ const service = {
   },
   async postAskChampions(id, message) {
       const route = routes.ask.replace("{id}", id)
+      alert(route)
       
       const options = {
           method: "POST",
           headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
           },
           body: JSON.stringify({
-              question: message,
+              question: message
           })
       };
 
@@ -26,14 +27,90 @@ const service = {
       return await response.json()
   }
 }
-async function main() {
-console.log(service.getChampions())
 
-  // Chamada pra api
-  // Guardar dados de personagens
+const state ={
+  values: {
+    champions: [],
+  },
+  views: {
+    response: document.querySelector(".text-response"),
+    question: document.getElementById("text-request"),
+    avatar: document.getElementById("avatar"),
+    carrousel : document.getElementById("carousel-cards-content"),
+
+  }
+}
+
+async function main() {
+
   // Carregar personagens na tela
+  await loadChampions()
+  await renderChampion()
+
   // resetar a tela
   await loadCarrousel();
+}
+
+async function loadChampions(){
+    // Chamada pra api
+    const data = await service.getChampions();
+   
+    // Guardar dados de personagens
+    state.values.champions = data;
+}
+
+async function renderChampion(){
+  // Chamada pra api
+  const championsData = state.values.champions;
+ 
+  // Guardar dados de personagens
+
+  const elements = championsData.map((character) =>
+    `<div class="timeline-carousel__item" onclick=onChangeChampionSelected(${character.id},'${character.imageUrl}')>
+      <div class="timeline-carousel__image">
+        <div class="media-wrapper media-wrapper--overlay"
+          style="background: url('${character.imageUrl}') center center; background-size:cover;">
+        </div>
+      </div>
+      <div class="timeline-carousel__item-inner">
+        <span class="name">${character.name}</span>
+        <span class="role">${character.role}</span>
+        <p>${character.lore}/p>
+      </div>
+    </div>
+  </div>`
+  )
+
+  state.views.carrousel.innerHTML = elements.join(" ")
+}
+
+async function onChangeChampionSelected(id, imageUrl){
+  state.views.avatar.dataset.id = id
+  state.views.avatar.style.backgroundImage = `url(${imageUrl})`
+}
+
+async function resetForm(){
+  state.views.question.value = "";
+  state.views.response.textContent = await getRandomQuote();
+
+}
+
+async function getRandomQuote(){
+  const quotes = [];
+
+  const randonIndex = Math.floor(Math.random()) * quotes.length
+
+  return quotes[randonIndex]
+}
+
+async function fetchAskChampion(){
+  document.body.style.cursor = "wait"
+  const id = state.views.avatar.dataset.id
+  const message = state.views.question.value
+  const response = await service.postAskChampions(id, message)
+  state.views.response.textContent = response.answer;
+  document.body.style.cursor = "default"
+
 }
 
 main()
