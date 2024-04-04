@@ -11,7 +11,6 @@ const service = {
   },
   async postAskChampions(id, message) {
       const route = routes.ask.replace("{id}", id)
-      alert(route)
       
       const options = {
           method: "POST",
@@ -41,15 +40,7 @@ const state ={
   }
 }
 
-async function main() {
 
-  // Carregar personagens na tela
-  await loadChampions()
-  await renderChampion()
-
-  // resetar a tela
-  await loadCarrousel();
-}
 
 async function loadChampions(){
     // Chamada pra api
@@ -75,9 +66,8 @@ async function renderChampion(){
       <div class="timeline-carousel__item-inner">
         <span class="name">${character.name}</span>
         <span class="role">${character.role}</span>
-        <p>${character.lore}/p>
-      </div>
-    </div>
+        <p>${character.lore}</p>
+      </div>f
   </div>`
   )
 
@@ -113,7 +103,6 @@ async function fetchAskChampion(){
 
 }
 
-main()
 
 async function loadCarrousel() {
   const caroujs = (el) => {
@@ -145,6 +134,15 @@ async function loadCarrousel() {
   });
 }
 
+async function main() {
 
+  // Carregar personagens na tela
+  await loadChampions()
+  await renderChampion()
 
-loadCarrousel();
+  // resetar a tela
+  await loadCarrousel();
+}
+
+main()
+
